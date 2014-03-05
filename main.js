@@ -2,13 +2,17 @@
 define(function (require, exports, module) {
     'use strict';
     
-    var CommandManager = brackets.getModule("command/CommandManager"),
+    var EditorManager = brackets.getModule("editor/EditorManager"),
+        CommandManager = brackets.getModule("command/CommandManager"),
         Menus = brackets.getModule("command/Menus"),
         KeyBindingManager = brackets.getModule("command/KeyBindingManager"),
         AppInit = brackets.getModule("utils/AppInit");
  
     function moveBeginningOfLine() {
-        console.log("Move beginning of Line");
+        var editor      = EditorManager.getFocusedEditor(),
+            cursorPos   = editor.getCursorPos();
+        
+        editor.setCursorPos(cursorPos.line, 0);
     }
     
     AppInit.appReady(function () {
@@ -41,6 +45,11 @@ define(function (require, exports, module) {
             });
         }, 1000);
         
+//        
+//        CommandManager.register(Strings.CMD_CUT,              Commands.EDIT_CUT,              ignoreCommand);
+//        CommandManager.register(Strings.CMD_COPY,             Commands.EDIT_COPY,             ignoreCommand);
+//        CommandManager.register(Strings.CMD_PASTE,            Commands.EDIT_PASTE,            ignoreCommand);
+
         //log("Brackets EMACS Keybindings extension loaded.");
  
     });
