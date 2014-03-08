@@ -10,26 +10,17 @@ define(function (require, exports, module) {
         KeyBindingManager   = brackets.getModule("command/KeyBindingManager"),
         AppInit             = brackets.getModule("utils/AppInit"),
         
+        // Constants
+        CHAR    = 0,
+        WORD    = 1,
+        LINE    = 2,
+        
         // Text Selection Ring
         ring        = [],
         ringLength  = 30,
         
         // Mark
         isMarkSet   = false;
-     
-    function moveBeginningOfLine() {
-        var editor      = EditorManager.getFocusedEditor(),
-            cursorPos   = editor.getCursorPos();
-        editor.setCursorPos(cursorPos.line, 0);
-    }
-
-    function moveEndOfLine() {
-        var editor      = EditorManager.getFocusedEditor(),
-            cursorPos   = editor.getCursorPos();
-        // @todo: don't have a way to get the current line
-        // This is a crude way to get to the end of line
-        editor.setCursorPos(cursorPos.line, 1000);
-    }
 
     function setMarkCommand() {
         isMarkSet = !isMarkSet;
@@ -67,17 +58,42 @@ define(function (require, exports, module) {
         doc.replaceRange(ring[ring.length - 1], cursorPos);
     }
 
+    function iSearchBackward() {
+        // @todo: stub
+    }
+    
+    function moveCursor(unit, type, relative) {
+        var editor      = EditorManager.getFocusedEditor(),
+            cursorPos   = editor.getCursorPos(),
+            line        = cursorPos.line,
+            char        = cursorPos.ch;
+        switch (type) {
+        case CHAR:
+            char += unit - (relative ? char : 0);
+            break;
+        case LINE:
+            line += unit - (relative ? line : 0);
+            break;
+        }
+        editor.setCursorPos(line, char);
+    }
+    
     AppInit.appReady(function () {
 
         var menus = Menus.getMenu(Menus.AppMenuBar.VIEW_MENU),
             
             // Command Ids
-            MOVE_BEGINNING_OF_LINE = "emacs.move-beginning-of-line",
-            MOVE_END_OF_LINE = "emacs.move-end-of-line",
-            YANK = "emacs.yank",
-            SET_MARK_COMMAND = "emacs.set-mark-command",
-            KILL_REGION = "emacs.kill-region",
-            KILL_RING_SAVE = "emacs.kill-ring-save",
+            MOVE_BEGINNING_OF_LINE  = "emacs.move-beginning-of-line",
+            MOVE_END_OF_LINE        = "emacs.move-end-of-line",
+            YANK                    = "emacs.yank",
+            SET_MARK_COMMAND        = "emacs.set-mark-command",
+            KILL_REGION             = "emacs.kill-region",
+            KILL_RING_SAVE          = "emacs.kill-ring-save",
+            ISEARCH_BACKWARD        = "emacs.isearch-backward",
+            FORWARD_CHAR            = "emacs.forward-char",
+            BACKWARD_CHAR           = "emacs.backward-char",
+            PREVIOUS_LINE           = "emacs.previous-line",
+            NEXT_LINE               = "emacs.next-line",
 
             /*
              * Emacs commands
@@ -86,47 +102,77 @@ define(function (require, exports, module) {
              */
             commands = [
                 {
-                    id: MOVE_BEGINNING_OF_LINE,
-                    name: "Move Beginning of Line",
+                    id:         MOVE_BEGINNING_OF_LINE,
+                    name:       "Move Beginning of Line",
                     keyBinding: "Ctrl-A",
-                    callback: moveBeginningOfLine
+                    callback:   moveCursor.bind(this, 0, CHAR, true)
                 },
                 {
-                    id: MOVE_END_OF_LINE,
-                    name: "Move End of Line",
+                    id:         MOVE_END_OF_LINE,
+                    name:       "Move End of Line",
                     keyBinding: "Ctrl-E",
-                    callback: moveEndOfLine
+                    callback:   moveCursor.bind(this, 1000, CHAR, true) // @todo: Hardcoded 1000 as end of line.
                 },
                 {
-                    id: YANK,
-                    name: "Yank",
+                    id:         YANK,
+                    name:       "Yank",
                     keyBinding: "Ctrl-Y",
-                    callback: yank
+                    callback:   yank
                 },
                 {
-                    id: SET_MARK_COMMAND,
-                    name: "Set Mark Command",
+                    id:         SET_MARK_COMMAND,
+                    name:       "Set Mark Command",
                     keyBinding: "Ctrl-Space",
-                    callback: setMarkCommand
+                    callback:   setMarkCommand
                 },
                 {
-                    id: KILL_REGION,
-                    name: "Kill Region",
+                    id:         KILL_REGION,
+                    name:       "Kill Region",
                     keyBinding: "Ctrl-W",
-                    callback: killRegion
+                    callback:   killRegion
                 },
                 {
-                    id: KILL_RING_SAVE,
-                    name: "Kill Ring Save",
+                    id:         KILL_RING_SAVE,
+                    name:       "Kill Ring Save",
                     keyBinding: "Alt-W",
-                    callback: killRingSave
+                    callback:   killRingSave
+                },
+                {
+                    id:         ISEARCH_BACKWARD,
+                    name:       "Incremental Search Backward",
+                    keyBinding: "Ctrl-R",
+                    callback:   iSearchBackward
+                },
+                {
+                    id:         FORWARD_CHAR,
+                    name:       "Forward Character",
+                    keyBinding: "Ctrl-F",
+                    callback:   moveCursor.bind(this, 1, CHAR)
+                },
+                {
+                    id:         BACKWARD_CHAR,
+                    name:       "Backward Character",
+                    keyBinding: "Ctrl-B",
+                    callback:   moveCursor.bind(this, -1, CHAR)
+                },
+                {
+                    id:         NEXT_LINE,
+                    name:       "Next Line",
+                    keyBinding: "Ctrl-N",
+                    callback:   moveCursor.bind(this, 1, LINE)
+                },
+                {
+                    id:         PREVIOUS_LINE,
+                    name:       "Previous Line",
+                    keyBinding: "Ctrl-P",
+                    callback:   moveCursor.bind(this, -1, LINE)
                 }
             ],
         
             // override commands
             overrideCommands = [
                 {
-                    id: Commands.EDIT_UNDO,
+                    id:         Commands.EDIT_UNDO,
                     keyBinding: "Ctrl-/"
                 }
             ];
