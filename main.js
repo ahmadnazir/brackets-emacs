@@ -89,11 +89,13 @@ define(function (require, exports, module) {
             SET_MARK_COMMAND        = "emacs.set-mark-command",
             KILL_REGION             = "emacs.kill-region",
             KILL_RING_SAVE          = "emacs.kill-ring-save",
-            ISEARCH_BACKWARD        = "emacs.isearch-backward",
             FORWARD_CHAR            = "emacs.forward-char",
             BACKWARD_CHAR           = "emacs.backward-char",
             PREVIOUS_LINE           = "emacs.previous-line",
             NEXT_LINE               = "emacs.next-line",
+
+            // .. not implemented ..
+            ISEARCH_BACKWARD        = "emacs.isearch-backward",
 
             /*
              * Emacs commands
@@ -174,7 +176,12 @@ define(function (require, exports, module) {
                 {
                     id:         Commands.EDIT_UNDO,
                     keyBinding: "Ctrl-/"
+                },
+                {
+                    id:         Commands.EDIT_LINE_COMMENT,
+                    keyBinding: "Alt-;"
                 }
+
 //              // @todo: activate this when file save keybinding is implemented
 //              {
 //                  id:         Commands.EDIT_FIND,
