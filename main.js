@@ -175,6 +175,12 @@ define(function (require, exports, module) {
                     id:         Commands.EDIT_UNDO,
                     keyBinding: "Ctrl-/"
                 }
+//              // @todo: activate this when file save keybinding is implemented
+//              {
+//                  id:         Commands.EDIT_FIND,
+//                  keyBinding: "Ctrl-S"
+//              }
+
             ];
         
         function remap(item) {
