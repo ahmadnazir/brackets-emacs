@@ -11,9 +11,10 @@ define(function (require, exports, module) {
         AppInit             = brackets.getModule("utils/AppInit"),
         
         // Constants
-        CHAR    = 0,
-        WORD    = 1,
-        LINE    = 2,
+        CHAR        = "character",
+        WORD        = "word",
+        LINE        = "line",
+        MAX_LINE_LENGTH = 1000,
         
         // Text Selection Ring
         ring        = [],
@@ -62,20 +63,49 @@ define(function (require, exports, module) {
         // @todo: stub
     }
     
-    function moveCursor(unit, type, relative) {
+    /**
+     * Function to move the cursor
+     *
+     * @param   {number}    unit        Number of units to move
+     * @param   {number}    type        CHAR|WORD|LINE
+     * @param   {boolean}   absolute    Flag to specify if the cursor isn't moved relative to the current
+     *                                  position
+     */
+    function moveCursor(unit, type, absolute) {
         var editor      = EditorManager.getFocusedEditor(),
             cursorPos   = editor.getCursorPos(),
             line        = cursorPos.line,
-            char        = cursorPos.ch;
+            column        = cursorPos.ch;
         switch (type) {
         case CHAR:
-            char += unit - (relative ? char : 0);
+            column += unit - (absolute ? column : 0);
             break;
         case LINE:
-            line += unit - (relative ? line : 0);
+            line += unit - (absolute ? line : 0);
+            break;
+        case WORD:
+            if (Math.abs(unit) !== 1) {
+                console.error("Cursor positioning for multiple words is not supported");
+                return;
+            }
+            var text = editor.document.getLine(line),
+                lineLength = text.length;
+            if (unit === 1) {
+                text = text.substring(column);
+            } else {
+                text = text.split("").reverse().join("").substring(lineLength - column);
+            }
+                
+            var indexOfNextWord = text.search(/\W\w/) + 1;
+            if (indexOfNextWord > 0) {
+                column += (unit * indexOfNextWord) - (absolute ? column : 0);
+            } else {
+                line += unit > 0 ? 1 : -1;
+                column = MAX_LINE_LENGTH;
+            }
             break;
         }
-        editor.setCursorPos(line, char);
+        editor.setCursorPos(line, column);
     }
     
     AppInit.appReady(function () {
@@ -91,6 +121,8 @@ define(function (require, exports, module) {
             KILL_RING_SAVE          = "emacs.kill-ring-save",
             FORWARD_CHAR            = "emacs.forward-char",
             BACKWARD_CHAR           = "emacs.backward-char",
+            FORWARD_WORD            = "emacs.forward-word",
+            BACKWARD_WORD           = "emacs.backward-word",
             PREVIOUS_LINE           = "emacs.previous-line",
             NEXT_LINE               = "emacs.next-line",
 
@@ -113,7 +145,7 @@ define(function (require, exports, module) {
                     id:         MOVE_END_OF_LINE,
                     name:       "Move End of Line",
                     keyBinding: "Ctrl-E",
-                    callback:   moveCursor.bind(this, 1000, CHAR, true) // @todo: Hardcoded 1000 as end of line.
+                    callback:   moveCursor.bind(this, MAX_LINE_LENGTH, CHAR, true)
                 },
                 {
                     id:         YANK,
@@ -156,6 +188,18 @@ define(function (require, exports, module) {
                     name:       "Backward Character",
                     keyBinding: "Ctrl-B",
                     callback:   moveCursor.bind(this, -1, CHAR)
+                },
+                {
+                    id:         FORWARD_WORD,
+                    name:       "Forward Word",
+                    keyBinding: "Alt-F",
+                    callback:   moveCursor.bind(this, 1, WORD)
+                },
+                {
+                    id:         BACKWARD_WORD,
+                    name:       "Backward Word",
+                    keyBinding: "Alt-B",
+                    callback:   moveCursor.bind(this, -1, WORD)
                 },
                 {
                     id:         NEXT_LINE,
