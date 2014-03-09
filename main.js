@@ -214,40 +214,36 @@ define(function (require, exports, module) {
                     name:       "Previous Line",
                     keyBinding: "Ctrl-P",
                     callback:   moveCursor.bind(this, -1, LINE)
-                }
-            ],
-        
-            // override commands
-            overrideCommands = [
+                },
+                // override
                 {
                     id:         Commands.EDIT_UNDO,
-                    keyBinding: "Ctrl-/"
+                    keyBinding: "Ctrl-/",
+                    override:   true
                 },
                 {
                     id:         Commands.EDIT_LINE_COMMENT,
-                    keyBinding: "Alt-;"
+                    keyBinding: "Alt-;",
+                    override:   true
                 }
-
 //              // @todo: activate this when file save keybinding is implemented
 //              {
 //                  id:         Commands.EDIT_FIND,
 //                  keyBinding: "Ctrl-S"
 //              }
-
             ];
         
         function remap(item) {
+            if (!item.override) {
+                CommandManager.register(item.name, item.id, item.callback);
+            }
             KeyBindingManager.removeBinding(item.keyBinding);
             KeyBindingManager.addBinding(item.id, item.keyBinding);
             menus.addMenuItem(item.id);
         }
-                
-        commands.forEach(function (item, index) {
-            CommandManager.register(item.name, item.id, item.callback);
-        });
 
-        window.setTimeout(function () { // @todo: keybinding module takes some time to load
-            overrideCommands.forEach(remap);
+        // @todo: using setTimeout since keybinding module takes some time to load        
+        window.setTimeout(function () {
             menus.addMenuItem(Menus.DIVIDER);
             commands.forEach(remap);
         }, 500);
