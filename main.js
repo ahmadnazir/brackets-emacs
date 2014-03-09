@@ -93,6 +93,8 @@ define(function (require, exports, module) {
             if (unit === 1) {
                 text = text.substring(column);
             } else {
+                // @todo: use a better implementation for reversing a string
+                // http://eddmann.com/posts/ten-ways-to-reverse-a-string-in-javascript/
                 text = text.split("").reverse().join("").substring(lineLength - column);
             }
                 
