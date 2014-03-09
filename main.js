@@ -18,7 +18,8 @@ define(function (require, exports, module) {
         
         // Text Selection Ring
         ring        = [],
-        ringLength  = 30,
+        ringIndex   = 0,
+        ringSize    = 15,
         
         // Mark
         isMarkSet   = false;
@@ -33,7 +34,9 @@ define(function (require, exports, module) {
         if (!selectedText) {
             return;
         }
-        ring.push(selectedText);
+        ring[ringIndex % ringSize] = selectedText;
+        ringIndex++;
+        console.log(ring);
     }
 
     function killRingSave() {
@@ -56,7 +59,7 @@ define(function (require, exports, module) {
         var editor      = EditorManager.getFocusedEditor(),
             doc         = editor.document,
             cursorPos   = editor.getCursorPos();
-        doc.replaceRange(ring[ring.length - 1], cursorPos);
+        doc.replaceRange(ring[(ringIndex - 1) % ringSize], cursorPos);
     }
 
     function iSearchBackward() {
