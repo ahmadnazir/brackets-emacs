@@ -36,7 +36,6 @@ define(function (require, exports, module) {
         }
         ring[ringIndex % ringSize] = selectedText;
         ringIndex++;
-        console.log(ring);
     }
 
     function killRingSave() {
