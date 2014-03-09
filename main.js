@@ -116,7 +116,6 @@ define(function (require, exports, module) {
             MOVE_BEGINNING_OF_LINE  = "emacs.move-beginning-of-line",
             MOVE_END_OF_LINE        = "emacs.move-end-of-line",
             YANK                    = "emacs.yank",
-            SET_MARK_COMMAND        = "emacs.set-mark-command",
             KILL_REGION             = "emacs.kill-region",
             KILL_RING_SAVE          = "emacs.kill-ring-save",
             FORWARD_CHAR            = "emacs.forward-char",
@@ -127,6 +126,7 @@ define(function (require, exports, module) {
             NEXT_LINE               = "emacs.next-line",
 
             // .. not implemented ..
+            SET_MARK_COMMAND        = "emacs.set-mark-command",
             ISEARCH_BACKWARD        = "emacs.isearch-backward",
 
             /*
