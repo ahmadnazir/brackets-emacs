@@ -128,7 +128,7 @@ define(function (require, exports, module) {
             BACKWARD_WORD           = "emacs.backward-word",
             PREVIOUS_LINE           = "emacs.previous-line",
             NEXT_LINE               = "emacs.next-line",
-
+            PREFIX_COMMAND          = "emacs.prefix-command",
             // .. not implemented ..
             SET_MARK_COMMAND        = "emacs.set-mark-command",
             ISEARCH_BACKWARD        = "emacs.isearch-backward",
@@ -156,12 +156,6 @@ define(function (require, exports, module) {
                     name:       "Yank",
                     keyBinding: "Ctrl-Y",
                     callback:   yank
-                },
-                {
-                    id:         SET_MARK_COMMAND,
-                    name:       "Set Mark Command",
-                    keyBinding: "Ctrl-Space",
-                    callback:   setMarkCommand
                 },
                 {
                     id:         KILL_REGION,
@@ -217,7 +211,19 @@ define(function (require, exports, module) {
                     keyBinding: "Ctrl-P",
                     callback:   moveCursor.bind(this, -1, LINE)
                 },
-                // override
+                {
+                    id:         PREFIX_COMMAND,
+                    name:       "Prefix Command",
+                    keyBinding: "Ctrl-X",
+                    commands:   [
+                        {
+                            id:         Commands.FILE_OPEN,
+                            keyBinding: "Ctrl-F",
+                            override:   true
+                        }
+                        
+                    ]
+                },
                 {
                     id:         Commands.EDIT_UNDO,
                     keyBinding: "Ctrl-/",
@@ -228,16 +234,82 @@ define(function (require, exports, module) {
                     keyBinding: "Alt-;",
                     override:   true
                 }
+//              {
+//                  id:         SET_MARK_COMMAND,
+//                  name:       "Set Mark Command",
+//                  keyBinding: "Ctrl-Space",
+//                  callback:   setMarkCommand
+//              },
 //              // @todo: activate this when file save keybinding is implemented
 //              {
 //                  id:         Commands.EDIT_FIND,
 //                  keyBinding: "Ctrl-S"
 //              }
             ];
+
+        
+        /**
+         * EventHandler Class
+         *
+         * Executes relevant commands when any of the specified keybindings are used.
+         *
+         * @param   {Array} commands    Commands that can be used for the next keybinding.
+         *
+         * @todo: move the EventHandler to a separate module
+         */
+        function EventHandler(allCommands) {
+            this.availableCommands = allCommands; // @todo: no need to copy array, right?
+        }
+
+        EventHandler.prototype.commands = commands;
+        
+        EventHandler.prototype.availableCommands = undefined; // set on instantiation
+        
+        EventHandler.prototype.getCommand = function (keyBinding) {
+            var command = this.availableCommands.filter(function find(command) {
+                return (command.keyBinding === keyBinding) ? command : false;
+            });
+            if (command.length === 1) {
+                return command[0]; // get the first match, there should only be one
+            }
+            return false;
+        };
+
+        /**
+         * Function for reseting the context i.e. the number of available commands are not dependent on the last keyBinding used
+         *
+         * @param   {Array} commands    Commands that can be used for the next keybinding.
+         */
+        EventHandler.prototype.resetContext = function (commands) {
+            this.availableCommands = commands || this.commands;
+        };
+
+        EventHandler.prototype.handle = function (keyBinding) {
+            // Get the command to execute based on the stack
+            var command = this.getCommand(keyBinding);
+            
+            if (!command) {
+                this.resetContext();
+                return;
+            }
+            
+            if (!command.commands) {
+                if (command.override) {
+                    CommandManager.execute(command.id);
+                } else {
+                    command.callback();
+                }
+            }
+            
+            // Update the context
+            this.resetContext(command.commands || undefined);
+        };
+        
+        var handler = new EventHandler(commands);
         
         function remap(item) {
             if (!item.override) {
-                CommandManager.register(item.name, item.id, item.callback);
+                CommandManager.register(item.name, item.id, handler.handle.bind(handler, item.keyBinding));
             }
             KeyBindingManager.removeBinding(item.keyBinding);
             KeyBindingManager.addBinding(item.id, item.keyBinding);
