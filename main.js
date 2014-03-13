@@ -220,8 +220,12 @@ define(function (require, exports, module) {
                             id:         Commands.FILE_OPEN,
                             keyBinding: "Ctrl-F",
                             override:   true
+                        },
+                        {
+                            id:         Commands.FILE_SAVE,
+                            keyBinding: "Ctrl-S",
+                            override:   true
                         }
-                        
                     ]
                 },
                 {
@@ -233,6 +237,11 @@ define(function (require, exports, module) {
                     id:         Commands.EDIT_LINE_COMMENT,
                     keyBinding: "Alt-;",
                     override:   true
+                },
+                {
+                    id:         Commands.EDIT_FIND,
+                    keyBinding: "Ctrl-S",
+                    override:   true
                 }
 //              {
 //                  id:         SET_MARK_COMMAND,
@@ -240,14 +249,9 @@ define(function (require, exports, module) {
 //                  keyBinding: "Ctrl-Space",
 //                  callback:   setMarkCommand
 //              },
-//              // @todo: activate this when file save keybinding is implemented
-//              {
-//                  id:         Commands.EDIT_FIND,
-//                  keyBinding: "Ctrl-S"
-//              }
             ];
 
-        
+
         /**
          * EventHandler Class
          *
@@ -306,20 +310,38 @@ define(function (require, exports, module) {
         };
         
         var handler = new EventHandler(commands);
-        
-        function remap(item) {
-            if (!item.override) {
-                CommandManager.register(item.name, item.id, handler.handle.bind(handler, item.keyBinding));
+
+        function removeBinding(command) {
+            KeyBindingManager.removeBinding(command.keyBinding);
+            if (typeof command.commands !== "undefined" && command.commands.length > 0) {
+                command.commands.forEach(removeBinding);
             }
-            KeyBindingManager.removeBinding(item.keyBinding);
-            KeyBindingManager.addBinding(item.id, item.keyBinding);
-            menus.addMenuItem(item.id);
+        }
+
+        function addBinding(command) {
+            if (command.override) {
+                return;
+            }
+            KeyBindingManager.addBinding(command.id, command.keyBinding);
+        }
+        
+        function register(command) {
+            if (command.override) {
+                return;
+            }
+            CommandManager.register(command.name,
+                                    command.id,
+                                    handler.handle.bind(handler, command.keyBinding));
+
+            menus.addMenuItem(command.id);
         }
 
         // @todo: using setTimeout since keybinding module takes some time to load        
         window.setTimeout(function () {
             menus.addMenuItem(Menus.DIVIDER);
-            commands.forEach(remap);
+            commands.forEach(removeBinding);
+            commands.forEach(register);
+            commands.forEach(addBinding);
         }, 500);
          
     });
