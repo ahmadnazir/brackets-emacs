@@ -16,19 +16,19 @@ define(function (require, exports, module) {
         LINE        = "line",
         MAX_LINE_LENGTH = 1000,
         
+//        // Mark
+//        isMarkSet   = false;
+
         // Text Selection Ring
         ring        = [],
         ringIndex   = 0,
-        ringSize    = 15,
+        ringSize    = 15;
         
-        // Mark
-        isMarkSet   = false;
-
-    function setMarkCommand() {
-        isMarkSet = !isMarkSet;
-        
-        console.log("Mark " + (isMarkSet ? "un" : "") + "set");
-    }
+//    function setMarkCommand() {
+//        isMarkSet = !isMarkSet;
+//        
+//        console.log("Mark " + (isMarkSet ? "un" : "") + "set");
+//    }
 
     function _killRingSave(selectedText) {
         if (!selectedText) {
@@ -61,9 +61,9 @@ define(function (require, exports, module) {
         doc.replaceRange(ring[(ringIndex - 1) % ringSize], cursorPos);
     }
 
-    function iSearchBackward() {
-        // @todo: stub
-    }
+//    function iSearchBackward() {
+//        // @todo: stub
+//    }
     
     /**
      * Function to move the cursor
@@ -174,12 +174,12 @@ define(function (require, exports, module) {
                     keyBinding: "Alt-W",
                     callback:   killRingSave
                 },
-                {
-                    id:         ISEARCH_BACKWARD,
-                    name:       "Incremental Search Backward",
-                    keyBinding: "Ctrl-R",
-                    callback:   iSearchBackward
-                },
+//                {
+//                    id:         ISEARCH_BACKWARD,
+//                    name:       "Incremental Search Backward",
+//                    keyBinding: "Ctrl-R",
+//                    callback:   iSearchBackward
+//                },
                 {
                     id:         FORWARD_CHAR,
                     name:       "Forward Character",
@@ -256,7 +256,7 @@ define(function (require, exports, module) {
 //                  name:       "Set Mark Command",
 //                  keyBinding: "Ctrl-Space",
 //                  callback:   setMarkCommand
-//              },
+//              }
             ];
 
 
