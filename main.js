@@ -17,7 +17,7 @@ define(function (require, exports, module) {
         MAX_LINE_LENGTH = 1000,
         
 //        // Mark
-//        isMarkSet   = false;
+//        isMarkSet   = false,
 
         // Text Selection Ring
         ring        = [],
@@ -147,114 +147,114 @@ define(function (require, exports, module) {
                 {
                     id:         MOVE_BEGINNING_OF_LINE,
                     name:       "Move Beginning of Line",
-                    keyBinding: "Ctrl-A",
+                    key:        "Ctrl-A",
                     callback:   moveCursor.bind(this, 0, CHAR, true)
                 },
                 {
                     id:         MOVE_END_OF_LINE,
                     name:       "Move End of Line",
-                    keyBinding: "Ctrl-E",
+                    key:        "Ctrl-E",
                     callback:   moveCursor.bind(this, MAX_LINE_LENGTH, CHAR, true)
                 },
                 {
                     id:         YANK,
                     name:       "Yank",
-                    keyBinding: "Ctrl-Y",
+                    key:        "Ctrl-Y",
                     callback:   yank
                 },
                 {
                     id:         KILL_REGION,
                     name:       "Kill Region",
-                    keyBinding: "Ctrl-W",
+                    key:        "Ctrl-W",
                     callback:   killRegion
                 },
                 {
                     id:         KILL_RING_SAVE,
                     name:       "Kill Ring Save",
-                    keyBinding: "Alt-W",
+                    key:        "Alt-W",
                     callback:   killRingSave
                 },
 //                {
 //                    id:         ISEARCH_BACKWARD,
 //                    name:       "Incremental Search Backward",
-//                    keyBinding: "Ctrl-R",
+//                    key:        "Ctrl-R",
 //                    callback:   iSearchBackward
 //                },
                 {
                     id:         FORWARD_CHAR,
                     name:       "Forward Character",
-                    keyBinding: "Ctrl-F",
+                    key:        "Ctrl-F",
                     callback:   moveCursor.bind(this, 1, CHAR)
                 },
                 {
                     id:         BACKWARD_CHAR,
                     name:       "Backward Character",
-                    keyBinding: "Ctrl-B",
+                    key:        "Ctrl-B",
                     callback:   moveCursor.bind(this, -1, CHAR)
                 },
                 {
                     id:         FORWARD_WORD,
                     name:       "Forward Word",
-                    keyBinding: "Alt-F",
+                    key:        "Alt-F",
                     callback:   moveCursor.bind(this, 1, WORD)
                 },
                 {
                     id:         BACKWARD_WORD,
                     name:       "Backward Word",
-                    keyBinding: "Alt-B",
+                    key:        "Alt-B",
                     callback:   moveCursor.bind(this, -1, WORD)
                 },
                 {
                     id:         NEXT_LINE,
                     name:       "Next Line",
-                    keyBinding: "Ctrl-N",
+                    key:        "Ctrl-N",
                     callback:   moveCursor.bind(this, 1, LINE)
                 },
                 {
                     id:         PREVIOUS_LINE,
                     name:       "Previous Line",
-                    keyBinding: "Ctrl-P",
+                    key:        "Ctrl-P",
                     callback:   moveCursor.bind(this, -1, LINE)
                 },
                 {
                     id:         PREFIX_COMMAND,
                     name:       "Prefix Command",
-                    keyBinding: "Ctrl-X",
+                    key:        "Ctrl-X",
                     commands:   [
                         {
                             id:         FIND_FILE,
-                            keyBinding: "Ctrl-F",
-                            override:   Commands.FILE_OPEN
+                            key:        "Ctrl-F",
+                            overrideId:   Commands.FILE_OPEN
                         },
                         {
                             id:         SAVE_BUFFER,
-                            keyBinding: "Ctrl-S",
-                            override:   Commands.FILE_SAVE
+                            key:        "Ctrl-S",
+                            overrideId:   Commands.FILE_SAVE
                         }
                     ]
                 },
                 {
                     id:         UNDO,
                     name:       "Undo",
-                    keyBinding: "Ctrl-/",
-                    override:   Commands.EDIT_UNDO
+                    key:        "Ctrl-/",
+                    overrideId:   Commands.EDIT_UNDO
                 },
                 {
                     id:         COMMENT_DWIM,
                     name:       "Comment (Do What I Mean)",
-                    keyBinding: "Alt-;",
-                    override:   Commands.EDIT_LINE_COMMENT
+                    key:        "Alt-;",
+                    overrideId:   Commands.EDIT_LINE_COMMENT
                 },
                 {
                     id:         ISEARCH_FORWARD,
                     name:       "ISearch Forward",
-                    keyBinding: "Ctrl-S",
-                    override:   Commands.EDIT_FIND
+                    key:        "Ctrl-S",
+                    overrideId:   Commands.EDIT_FIND
                 }
 //              {
 //                  id:         SET_MARK_COMMAND,
 //                  name:       "Set Mark Command",
-//                  keyBinding: "Ctrl-Space",
+//                  key:        "Ctrl-Space",
 //                  callback:   setMarkCommand
 //              }
             ];
@@ -263,9 +263,9 @@ define(function (require, exports, module) {
         /**
          * EventHandler Class
          *
-         * Executes relevant commands when any of the specified keybindings are used.
+         * Executes relevant commands when any of the specified keys are used.
          *
-         * @param   {Array} commands    Commands that can be used for the next keybinding.
+         * @param   {Array} commands    Commands that can be used for the next key.
          *
          * @todo: move the EventHandler to a separate module
          */
@@ -277,9 +277,9 @@ define(function (require, exports, module) {
         
         EventHandler.prototype.availableCommands = undefined; // set on instantiation
         
-        EventHandler.prototype.getCommand = function (keyBinding) {
+        EventHandler.prototype.getCommand = function (key) {
             var command = this.availableCommands.filter(function find(command) {
-                return (command.keyBinding === keyBinding) ? command : false;
+                return (command.key === key) ? command : false;
             });
             if (command.length === 0) { // not found
                 return false;
@@ -288,17 +288,17 @@ define(function (require, exports, module) {
         };
 
         /**
-         * Function for reseting the context i.e. the number of available commands are not dependent on the last keyBinding used
+         * Function for reseting the context i.e. the number of available commands are not dependent on the last key used
          *
-         * @param   {Array} commands    Commands that can be used for the next keybinding.
+         * @param   {Array} commands    Commands that can be used for the next key.
          */
         EventHandler.prototype.resetContext = function (commands) {
             this.availableCommands = commands || this.commands;
         };
 
-        EventHandler.prototype.handle = function (keyBinding) {
+        EventHandler.prototype.handle = function (key) {
             // Get the command to execute based on the stack
-            var command = this.getCommand(keyBinding);
+            var command = this.getCommand(key);
             
             if (!command) {
                 this.resetContext();
@@ -306,8 +306,8 @@ define(function (require, exports, module) {
             }
             
             if (!command.commands) {
-                if (command.override) {
-                    CommandManager.execute(command.override);
+                if (command.overrideId) {
+                    CommandManager.execute(command.overrideId);
                 } else {
                     command.callback();
                 }
@@ -320,24 +320,24 @@ define(function (require, exports, module) {
         var handler = new EventHandler(commands);
 
         function removeBinding(command) {
-            KeyBindingManager.removeBinding(command.keyBinding);
+            KeyBindingManager.removeBinding(command.key);
             if (typeof command.commands !== "undefined" && command.commands.length > 0) {
                 command.commands.forEach(removeBinding);
             }
         }
 
         function addBinding(command) {
-            KeyBindingManager.addBinding(command.id, command.keyBinding);
+            KeyBindingManager.addBinding(command.id, command.key);
         }
 
         function register(command) {
             CommandManager.register(command.name,
                                     command.id,
-                                    handler.handle.bind(handler, command.keyBinding));
+                                    handler.handle.bind(handler, command.key));
             menus.addMenuItem(command.id);
         }
 
-        // @todo: using setTimeout since keybinding module takes some time to load        
+        // @todo: using setTimeout since key module takes some time to load        
         window.setTimeout(function () {
             menus.addMenuItem(Menus.DIVIDER);
             commands.forEach(removeBinding);
