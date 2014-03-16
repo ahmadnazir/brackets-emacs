@@ -129,6 +129,11 @@ define(function (require, exports, module) {
             PREVIOUS_LINE           = "emacs.previous-line",
             NEXT_LINE               = "emacs.next-line",
             PREFIX_COMMAND          = "emacs.prefix-command",
+            UNDO                    = "emacs.undo",
+            ISEARCH_FORWARD         = "emacs.isearch-forward",
+            FIND_FILE               = "emacs.find-file",
+            SAVE_BUFFER             = "emacs.save-buffer",
+            COMMENT_DWIM            = "emacs.comment-dwim",
             // .. not implemented ..
             SET_MARK_COMMAND        = "emacs.set-mark-command",
             ISEARCH_BACKWARD        = "emacs.isearch-backward",
@@ -217,31 +222,34 @@ define(function (require, exports, module) {
                     keyBinding: "Ctrl-X",
                     commands:   [
                         {
-                            id:         Commands.FILE_OPEN,
+                            id:         FIND_FILE,
                             keyBinding: "Ctrl-F",
-                            override:   true
+                            override:   Commands.FILE_OPEN
                         },
                         {
-                            id:         Commands.FILE_SAVE,
+                            id:         SAVE_BUFFER,
                             keyBinding: "Ctrl-S",
-                            override:   true
+                            override:   Commands.FILE_SAVE
                         }
                     ]
                 },
                 {
-                    id:         Commands.EDIT_UNDO,
+                    id:         UNDO,
+                    name:       "Undo",
                     keyBinding: "Ctrl-/",
-                    override:   true
+                    override:   Commands.EDIT_UNDO
                 },
                 {
-                    id:         Commands.EDIT_LINE_COMMENT,
+                    id:         COMMENT_DWIM,
+                    name:       "Comment (Do What I Mean)",
                     keyBinding: "Alt-;",
-                    override:   true
+                    override:   Commands.EDIT_LINE_COMMENT
                 },
                 {
-                    id:         Commands.EDIT_FIND,
+                    id:         ISEARCH_FORWARD,
+                    name:       "ISearch Forward",
                     keyBinding: "Ctrl-S",
-                    override:   true
+                    override:   Commands.EDIT_FIND
                 }
 //              {
 //                  id:         SET_MARK_COMMAND,
@@ -273,10 +281,10 @@ define(function (require, exports, module) {
             var command = this.availableCommands.filter(function find(command) {
                 return (command.keyBinding === keyBinding) ? command : false;
             });
-            if (command.length === 1) {
-                return command[0]; // get the first match, there should only be one
+            if (command.length === 0) { // not found
+                return false;
             }
-            return false;
+            return command[0]; // get the first match, there should only be one
         };
 
         /**
@@ -299,7 +307,7 @@ define(function (require, exports, module) {
             
             if (!command.commands) {
                 if (command.override) {
-                    CommandManager.execute(command.id);
+                    CommandManager.execute(command.override);
                 } else {
                     command.callback();
                 }
@@ -319,20 +327,13 @@ define(function (require, exports, module) {
         }
 
         function addBinding(command) {
-            if (command.override) {
-                return;
-            }
             KeyBindingManager.addBinding(command.id, command.keyBinding);
         }
-        
+
         function register(command) {
-            if (command.override) {
-                return;
-            }
             CommandManager.register(command.name,
                                     command.id,
                                     handler.handle.bind(handler, command.keyBinding));
-
             menus.addMenuItem(command.id);
         }
 
