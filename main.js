@@ -51,6 +51,10 @@ define(function (require, exports, module) {
             var start = editor.getCursorPos(),
                 end = {line: start.line, ch: start.ch + MAX_LINE_LENGTH},
                 text = doc.getRange(start, end);
+            if (!text) {
+                end.line++;
+                end.ch = 0;
+            }
             selection = {start: start, end: end};
             _killRingSave(text);
         } else {
