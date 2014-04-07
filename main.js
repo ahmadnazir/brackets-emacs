@@ -43,11 +43,20 @@ define(function (require, exports, module) {
         _killRingSave(editor.getSelectedText());
     }
 
-    function killRegion() {
+    function killRegion(killLine) {
         var editor      = EditorManager.getFocusedEditor(),
             doc         = editor.document,
-            selection   = editor.getSelection();
-        _killRingSave(editor.getSelectedText());
+            selection;
+        if (killLine) {
+            var start = editor.getCursorPos(),
+                end = {line: start.line, ch: start.ch + MAX_LINE_LENGTH},
+                text = doc.getRange(start, end);
+            selection = {start: start, end: end};
+            _killRingSave(text);
+        } else {
+            selection = editor.getSelection();
+            _killRingSave(editor.getSelectedText());
+        }
         doc.replaceRange("", selection.start, selection.end);
     }
 
@@ -122,6 +131,7 @@ define(function (require, exports, module) {
             YANK                    = "emacs.yank",
             KILL_REGION             = "emacs.kill-region",
             KILL_RING_SAVE          = "emacs.kill-ring-save",
+            KILL_LINE               = "emacs.kill-line",
             FORWARD_CHAR            = "emacs.forward-char",
             BACKWARD_CHAR           = "emacs.backward-char",
             FORWARD_WORD            = "emacs.forward-word",
@@ -174,6 +184,13 @@ define(function (require, exports, module) {
                     key:        "Alt-W",
                     callback:   killRingSave
                 },
+                {
+                    id:         KILL_LINE,
+                    name:       "Kill Ring Save",
+                    key:        "Ctrl-K",
+                    callback:   killRegion.bind(null, true)
+                },
+
 //                {
 //                    id:         ISEARCH_BACKWARD,
 //                    name:       "Incremental Search Backward",
