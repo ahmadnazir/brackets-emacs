@@ -54,6 +54,7 @@ define(function (require, exports, module) {
             if (!text) {
                 end.line++;
                 end.ch = 0;
+                text = "\n";
             }
             selection = {start: start, end: end};
             _killRingSave(text);
