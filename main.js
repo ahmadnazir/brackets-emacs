@@ -166,7 +166,7 @@ define(function (require, exports, module) {
             PREVIOUS_LINE           = "emacs.previous-line",
             NEXT_LINE               = "emacs.next-line",
             PREFIX_COMMAND          = "emacs.prefix-command",
-            PREFIX_FOR_KEY_G        = "emacs.random",
+            KEYBOARD_QUIT        = "emacs.keyboard-quit",
             UNDO                    = "emacs.undo",
             REDO                    = "emacs.redo",
             ISEARCH_FORWARD         = "emacs.isearch-forward",
@@ -300,8 +300,8 @@ define(function (require, exports, module) {
                     ]
                 },
                 {
-                    id:         PREFIX_FOR_KEY_G,
-                    name:       "Prefix command for key C-G",
+                    id:         KEYBOARD_QUIT,
+                    name:       "Keyboard Quit",
                     key:        "Ctrl-G",
                     commands:   [
                         {
