@@ -1,3 +1,13 @@
 1.0.2   (7th April 2014)
 
-Ctrl-K  :   kill-line
+Ctrl-K              :   "kill-line"
+
+
+1.0.3   (17th April 2014)
+
+Alt-U               :   "upcase-word"
+Alt-L               :   "downcase-word"
+Ctrl-G Ctrl-/       :   Redo
+Ctrl-X Ctrl-W       :   "write-file"
+
+Thanks to Udit Mukherjee (uditmukherjee457) for the contributions.
