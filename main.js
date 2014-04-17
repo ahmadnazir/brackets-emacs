@@ -175,6 +175,7 @@ define(function (require, exports, module) {
             COMMENT_DWIM            = "emacs.comment-dwim",
             UPCASE_REGION           = "emacs.upcase-region",
             DOWNCASE_REGION         = "emacs.downcase-region",
+            SAVE_AS                 = "emacs.write-file",
             // .. not implemented ..
             SET_MARK_COMMAND        = "emacs.set-mark-command",
             ISEARCH_BACKWARD        = "emacs.isearch-backward",
@@ -290,6 +291,11 @@ define(function (require, exports, module) {
                             id:         SAVE_BUFFER,
                             key:        "Ctrl-S",
                             overrideId:   Commands.FILE_SAVE
+                        },
+                        {
+                            id:         SAVE_AS,
+                            key:        "Ctrl-W",
+                            overrideId:   Commands.FILE_SAVE_AS
                         }
                     ]
                 },
