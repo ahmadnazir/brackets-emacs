@@ -16,6 +16,9 @@ define(function (require, exports, module) {
         LINE        = "line",
         MAX_LINE_LENGTH = 1000,
         
+        UPPER       = "UpperCase",
+        LOWER       = "LowerCase",
+        
 //        // Mark
 //        isMarkSet   = false,
 
@@ -75,6 +78,26 @@ define(function (require, exports, module) {
         doc.replaceRange(ring[(ringIndex - 1) % ringSize], cursorPos);
     }
 
+    function toggleCase(type) {
+        var editor       = EditorManager.getActiveEditor(),
+            doc          = editor.document,
+            cursorPos    = editor.getCursorPos();
+        var selectedText = editor.getSelectedText();
+        var textRange    = editor.getSelection();
+        if (!selectedText) {
+            return;
+        }
+        switch (type) {
+        case UPPER:
+            selectedText = selectedText.toUpperCase();
+            break;
+        case LOWER:
+            selectedText = selectedText.toLowerCase();
+            break;
+        }
+        doc.replaceRange(selectedText, textRange.start, textRange.end);
+    }
+    
 //    function iSearchBackward() {
 //        // @todo: stub
 //    }
@@ -149,10 +172,16 @@ define(function (require, exports, module) {
             FIND_FILE               = "emacs.find-file",
             SAVE_BUFFER             = "emacs.save-buffer",
             COMMENT_DWIM            = "emacs.comment-dwim",
+            
+            REDO                    = "emacs.redo",
+            SELECT_ALL              = "emacs.select-buffer",
+            UPCASE_REGION           = "emacs.upcase-region",
+            DOWNCASE_REGION         = "emacs.downcase-region",
+            
             // .. not implemented ..
             SET_MARK_COMMAND        = "emacs.set-mark-command",
             ISEARCH_BACKWARD        = "emacs.isearch-backward",
-
+            
             /*
              * Emacs commands
              *
@@ -239,6 +268,18 @@ define(function (require, exports, module) {
                     callback:   moveCursor.bind(this, -1, LINE)
                 },
                 {
+                    id:         UPCASE_REGION,
+                    name:       "Change to Upper",
+                    key:        "Alt-U",
+                    callback:   toggleCase.bind(this, UPPER)
+                },
+                {
+                    id:         DOWNCASE_REGION,
+                    name:       "Change to Lower",
+                    key:        "Alt-I",
+                    callback:   toggleCase.bind(this, LOWER)
+                },
+                {
                     id:         PREFIX_COMMAND,
                     name:       "Prefix Command",
                     key:        "Ctrl-X",
@@ -252,6 +293,19 @@ define(function (require, exports, module) {
                             id:         SAVE_BUFFER,
                             key:        "Ctrl-S",
                             overrideId:   Commands.FILE_SAVE
+                        },
+                        {
+                            id:          REDO,
+                            name:        "Redo",
+                            key:         "Ctrl-/",
+                            overrideId:  Commands.EDIT_REDO
+                            
+                        },
+                        {
+                            id:          SELECT_ALL,
+                            name:        "Select All",
+                            key:         "Ctrl-A",
+                            overrideId:  Commands.EDIT_SELECT_ALL
                         }
                     ]
                 },
@@ -259,19 +313,19 @@ define(function (require, exports, module) {
                     id:         UNDO,
                     name:       "Undo",
                     key:        "Ctrl-/",
-                    overrideId:   Commands.EDIT_UNDO
+                    overrideId: Commands.EDIT_UNDO
                 },
                 {
                     id:         COMMENT_DWIM,
                     name:       "Comment (Do What I Mean)",
                     key:        "Alt-;",
-                    overrideId:   Commands.EDIT_LINE_COMMENT
+                    overrideId: Commands.EDIT_LINE_COMMENT
                 },
                 {
                     id:         ISEARCH_FORWARD,
                     name:       "ISearch Forward",
                     key:        "Ctrl-S",
-                    overrideId:   Commands.EDIT_FIND
+                    overrideId: Commands.EDIT_FIND
                 }
 //              {
 //                  id:         SET_MARK_COMMAND,
