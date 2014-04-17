@@ -172,6 +172,7 @@ define(function (require, exports, module) {
             SAVE_BUFFER             = "emacs.save-buffer",
             COMMENT_DWIM            = "emacs.comment-dwim",
             UPCASE_REGION           = "emacs.upcase-region",
+            DOWNCASE_REGION         = "emacs.downcase-region",
             // .. not implemented ..
             SET_MARK_COMMAND        = "emacs.set-mark-command",
             ISEARCH_BACKWARD        = "emacs.isearch-backward",
@@ -266,6 +267,12 @@ define(function (require, exports, module) {
                     name:       "Change to Upper",
                     key:        "Alt-U",
                     callback:   toggleCase.bind(this, UPPER)
+                },
+                {
+                    id:         DOWNCASE_REGION,
+                    name:       "Change to Lower",
+                    key:        "Alt-L",
+                    callback:   toggleCase.bind(this, LOWER)
                 },
                 {
                     id:         PREFIX_COMMAND,
