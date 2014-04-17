@@ -166,7 +166,9 @@ define(function (require, exports, module) {
             PREVIOUS_LINE           = "emacs.previous-line",
             NEXT_LINE               = "emacs.next-line",
             PREFIX_COMMAND          = "emacs.prefix-command",
+            PREFIX_FOR_KEY_G        = "emacs.random",
             UNDO                    = "emacs.undo",
+            REDO                    = "emacs.redo",
             ISEARCH_FORWARD         = "emacs.isearch-forward",
             FIND_FILE               = "emacs.find-file",
             SAVE_BUFFER             = "emacs.save-buffer",
@@ -288,6 +290,18 @@ define(function (require, exports, module) {
                             id:         SAVE_BUFFER,
                             key:        "Ctrl-S",
                             overrideId:   Commands.FILE_SAVE
+                        }
+                    ]
+                },
+                {
+                    id:         PREFIX_FOR_KEY_G,
+                    name:       "Prefix command for key C-G",
+                    key:        "Ctrl-G",
+                    commands:   [
+                        {
+                            id:         REDO,
+                            key:        "Ctrl-/",
+                            overrideId:   Commands.EDIT_REDO
                         }
                     ]
                 },
