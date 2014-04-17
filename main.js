@@ -15,6 +15,8 @@ define(function (require, exports, module) {
         WORD        = "word",
         LINE        = "line",
         MAX_LINE_LENGTH = 1000,
+        UPPER       = "UpperCase",
+        LOWER       = "LowerCase",
         
 //        // Mark
 //        isMarkSet   = false,
@@ -73,6 +75,26 @@ define(function (require, exports, module) {
             doc         = editor.document,
             cursorPos   = editor.getCursorPos();
         doc.replaceRange(ring[(ringIndex - 1) % ringSize], cursorPos);
+    }
+    
+    function toggleCase(type) {
+        var editor       = EditorManager.getActiveEditor(),
+            doc          = editor.document,
+            cursorPos    = editor.getCursorPos();
+        var selectedText = editor.getSelectedText();
+        var textRange    = editor.getSelection();
+        if (!selectedText) {
+            return;
+        }
+        switch (type) {
+        case UPPER:
+            selectedText = selectedText.toUpperCase();
+            break;
+        case LOWER:
+            selectedText = selectedText.toLowerCase();
+            break;
+        }
+        doc.replaceRange(selectedText, textRange.start, textRange.end);
     }
 
 //    function iSearchBackward() {
@@ -144,11 +166,16 @@ define(function (require, exports, module) {
             PREVIOUS_LINE           = "emacs.previous-line",
             NEXT_LINE               = "emacs.next-line",
             PREFIX_COMMAND          = "emacs.prefix-command",
+            PREFIX_FOR_KEY_G        = "emacs.random",
             UNDO                    = "emacs.undo",
+            REDO                    = "emacs.redo",
             ISEARCH_FORWARD         = "emacs.isearch-forward",
             FIND_FILE               = "emacs.find-file",
             SAVE_BUFFER             = "emacs.save-buffer",
             COMMENT_DWIM            = "emacs.comment-dwim",
+            UPCASE_REGION           = "emacs.upcase-region",
+            DOWNCASE_REGION         = "emacs.downcase-region",
+            SAVE_AS                 = "emacs.write-file",
             // .. not implemented ..
             SET_MARK_COMMAND        = "emacs.set-mark-command",
             ISEARCH_BACKWARD        = "emacs.isearch-backward",
@@ -239,6 +266,18 @@ define(function (require, exports, module) {
                     callback:   moveCursor.bind(this, -1, LINE)
                 },
                 {
+                    id:         UPCASE_REGION,
+                    name:       "Change to Upper",
+                    key:        "Alt-U",
+                    callback:   toggleCase.bind(this, UPPER)
+                },
+                {
+                    id:         DOWNCASE_REGION,
+                    name:       "Change to Lower",
+                    key:        "Alt-L",
+                    callback:   toggleCase.bind(this, LOWER)
+                },
+                {
                     id:         PREFIX_COMMAND,
                     name:       "Prefix Command",
                     key:        "Ctrl-X",
@@ -252,6 +291,23 @@ define(function (require, exports, module) {
                             id:         SAVE_BUFFER,
                             key:        "Ctrl-S",
                             overrideId:   Commands.FILE_SAVE
+                        },
+                        {
+                            id:         SAVE_AS,
+                            key:        "Ctrl-W",
+                            overrideId:   Commands.FILE_SAVE_AS
+                        }
+                    ]
+                },
+                {
+                    id:         PREFIX_FOR_KEY_G,
+                    name:       "Prefix command for key C-G",
+                    key:        "Ctrl-G",
+                    commands:   [
+                        {
+                            id:         REDO,
+                            key:        "Ctrl-/",
+                            overrideId:   Commands.EDIT_REDO
                         }
                     ]
                 },
