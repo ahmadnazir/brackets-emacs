@@ -166,7 +166,7 @@ define(function (require, exports, module) {
             PREVIOUS_LINE           = "emacs.previous-line",
             NEXT_LINE               = "emacs.next-line",
             PREFIX_COMMAND          = "emacs.prefix-command",
-            KEYBOARD_QUIT        = "emacs.keyboard-quit",
+            KEYBOARD_QUIT           = "emacs.keyboard-quit",
             UNDO                    = "emacs.undo",
             REDO                    = "emacs.redo",
             ISEARCH_FORWARD         = "emacs.isearch-forward",
@@ -270,12 +270,18 @@ define(function (require, exports, module) {
                     name:       "Change to Upper",
                     key:        "Alt-U",
                     callback:   toggleCase.bind(this, UPPER)
+                    // @todo:
+                    // The handler only works if any text is selected.
+                    // The handler should automatically change case of the next word.
                 },
                 {
                     id:         DOWNCASE_REGION,
                     name:       "Change to Lower",
                     key:        "Alt-L",
                     callback:   toggleCase.bind(this, LOWER)
+                    // @todo:
+                    // The handler only works if any text is selected.
+                    // The handler should automatically change case of the next word.
                 },
                 {
                     id:         PREFIX_COMMAND,
@@ -303,11 +309,19 @@ define(function (require, exports, module) {
                     id:         KEYBOARD_QUIT,
                     name:       "Keyboard Quit",
                     key:        "Ctrl-G",
+                    // @todo:
+                    // bind this command to keyboard-quit handler
+                    // it should act similar to the Esc key in most cases
+                    // Will look into it later
                     commands:   [
                         {
                             id:         REDO,
                             key:        "Ctrl-/",
                             overrideId:   Commands.EDIT_REDO
+                            // @todo:
+                            // Ideally this should break the undo chain and start performing redos. However,
+                            // since we don't have a good way of tracking the keybindings used, the user
+                            // have to use Ctrl-G every time redo has to be performed. 
                         }
                     ]
                 },
