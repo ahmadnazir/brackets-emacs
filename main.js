@@ -15,6 +15,8 @@ define(function (require, exports, module) {
         WORD        = "word",
         LINE        = "line",
         MAX_LINE_LENGTH = 1000,
+        UPPER       = "UpperCase",
+        LOWER       = "LowerCase",
         
 //        // Mark
 //        isMarkSet   = false,
@@ -73,6 +75,26 @@ define(function (require, exports, module) {
             doc         = editor.document,
             cursorPos   = editor.getCursorPos();
         doc.replaceRange(ring[(ringIndex - 1) % ringSize], cursorPos);
+    }
+    
+    function toggleCase(type) {
+        var editor       = EditorManager.getActiveEditor(),
+            doc          = editor.document,
+            cursorPos    = editor.getCursorPos();
+        var selectedText = editor.getSelectedText();
+        var textRange    = editor.getSelection();
+        if (!selectedText) {
+            return;
+        }
+        switch (type) {
+        case UPPER:
+            selectedText = selectedText.toUpperCase();
+            break;
+        case LOWER:
+            selectedText = selectedText.toLowerCase();
+            break;
+        }
+        doc.replaceRange(selectedText, textRange.start, textRange.end);
     }
 
 //    function iSearchBackward() {
@@ -149,6 +171,7 @@ define(function (require, exports, module) {
             FIND_FILE               = "emacs.find-file",
             SAVE_BUFFER             = "emacs.save-buffer",
             COMMENT_DWIM            = "emacs.comment-dwim",
+            UPCASE_REGION           = "emacs.upcase-region",
             // .. not implemented ..
             SET_MARK_COMMAND        = "emacs.set-mark-command",
             ISEARCH_BACKWARD        = "emacs.isearch-backward",
@@ -237,6 +260,12 @@ define(function (require, exports, module) {
                     name:       "Previous Line",
                     key:        "Ctrl-P",
                     callback:   moveCursor.bind(this, -1, LINE)
+                },
+                {
+                    id:         UPCASE_REGION,
+                    name:       "Change to Upper",
+                    key:        "Alt-U",
+                    callback:   toggleCase.bind(this, UPPER)
                 },
                 {
                     id:         PREFIX_COMMAND,
