@@ -3,7 +3,7 @@
     "title": "Emacs keybindings",
     "author": "Ahmad N. Raja",
     "homepage": "https://github.com/ahmadnazir/brackets-emacs",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "engines": { "brackets": ">=0.36.0" },
     "description": "A brackets extension for Emacs keybindings",
     "keywords": ["emacs"]

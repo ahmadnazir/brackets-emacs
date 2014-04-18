@@ -11,3 +11,7 @@ Ctrl-G Ctrl-/       :   Redo
 Ctrl-X Ctrl-W       :   "write-file"
 
 Thanks to Udit Mukherjee (uditmukherjee457) for the contributions.
+
+1.0.4   (18th April 2014)
+
+Fixed a bug with the Alt-F command. The command did not work at the end of the line.
