@@ -84,6 +84,7 @@ define(function (require, exports, module) {
         var selectedText = editor.getSelectedText();
         var textRange    = editor.getSelection();
         if (!selectedText) {                                          //Change case of the whole word from cursor Position
+            // @todo: use _getWordPos and remove redundant code
             var text = editor.document.getLine(cursorPos.line),
                 column = cursorPos.ch,
                 remLength = text.length - column,
