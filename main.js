@@ -110,6 +110,37 @@ define(function (require, exports, module) {
 //    function iSearchBackward() {
 //        // @todo: stub
 //    }
+
+    function _getWordPos(num, absolute) {
+        var editor      = EditorManager.getFocusedEditor(),
+            cursorPos   = editor.getCursorPos(),
+            line        = cursorPos.line,
+            column        = cursorPos.ch;
+
+        if (Math.abs(num) !== 1) {
+            throw new Error("Cursor positioning for multiple words is not supported");
+        }
+        
+        var text = editor.document.getLine(line),
+            lineLength = text.length;
+        if (num === 1) {
+            text = text.substring(column);
+        } else {
+            // @todo: use a better implementation for reversing a string
+            // http://eddmann.com/posts/ten-ways-to-reverse-a-string-in-javascript/
+            text = text.split("").reverse().join("").substring(lineLength - column);
+        }
+
+        var indexOfNextWord = text.search(/\W\w/) + 1;
+        if (indexOfNextWord > 0) {
+            column += (num * indexOfNextWord) - (absolute ? column : 0);
+        } else {
+            line += num > 0 ? 1 : -1;
+            column = MAX_LINE_LENGTH;
+        }
+        
+        return {line: line, ch: column};
+    }
     
     /**
      * Function to move the cursor
@@ -132,27 +163,9 @@ define(function (require, exports, module) {
             line += unit - (absolute ? line : 0);
             break;
         case WORD:
-            if (Math.abs(unit) !== 1) {
-                console.error("Cursor positioning for multiple words is not supported");
-                return;
-            }
-            var text = editor.document.getLine(line),
-                lineLength = text.length;
-            if (unit === 1) {
-                text = text.substring(column);
-            } else {
-                // @todo: use a better implementation for reversing a string
-                // http://eddmann.com/posts/ten-ways-to-reverse-a-string-in-javascript/
-                text = text.split("").reverse().join("").substring(lineLength - column);
-            }
-                
-            var indexOfNextWord = text.search(/\W\w/) + 1;
-            if (indexOfNextWord > 0) {
-                column += (unit * indexOfNextWord) - (absolute ? column : 0);
-            } else {
-                line += unit > 0 ? 1 : -1;
-                column = MAX_LINE_LENGTH;
-            }
+            var pos = _getWordPos(unit, absolute);
+            line = pos.line;
+            column = pos.ch;
             break;
         }
         editor.setCursorPos(line, column);
