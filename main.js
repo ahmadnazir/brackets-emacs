@@ -136,7 +136,7 @@ define(function (require, exports, module) {
             column += (num * indexOfNextWord) - (absolute ? column : 0);
         } else {
             line += num > 0 ? 1 : -1;
-            column = MAX_LINE_LENGTH;
+            column = num > 0 ? 0 : MAX_LINE_LENGTH;
         }
         
         return {line: line, ch: column};
