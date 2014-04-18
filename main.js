@@ -83,12 +83,12 @@ define(function (require, exports, module) {
             cursorPos    = editor.getCursorPos();
         var selectedText = editor.getSelectedText();
         var textRange    = editor.getSelection();
-        if (!selectedText) {                                         //Change case of the whole word from cursor Position
+        if (!selectedText) {                                          //Change case of the whole word from cursor Position
             var text = editor.document.getLine(cursorPos.line),
                 column = cursorPos.ch,
                 remLength = text.length - column,
                 remText = text.substring(column, column + remLength), //Remaining text after cursor position
-                endIndex = remText.search(/\W\w/) + 1;               //Index of next word
+                endIndex = remText.search(/\W\w/) + 1;                //Index of next word
             selectedText = remText.substring(0, endIndex);
             //Range to replace
             textRange.start.line = cursorPos.line;
@@ -105,7 +105,7 @@ define(function (require, exports, module) {
             break;
         }
         doc.replaceRange(selectedText, textRange.start, textRange.end);
-        editor.setCursorPos(cursorPos);
+        editor.setCursorPos(cursorPos);                                //Reset to original cursor position
     }
 
 //    function iSearchBackward() {
