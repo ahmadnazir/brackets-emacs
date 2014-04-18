@@ -76,37 +76,6 @@ define(function (require, exports, module) {
             cursorPos   = editor.getCursorPos();
         doc.replaceRange(ring[(ringIndex - 1) % ringSize], cursorPos);
     }
-    
-    function toggleCase(type) {
-        var editor       = EditorManager.getActiveEditor(),
-            doc          = editor.document,
-            cursorPos    = editor.getCursorPos();
-        var selectedText = editor.getSelectedText();
-        var textRange    = editor.getSelection();
-        if (!selectedText) {                                          //Change case of the whole word from cursor Position
-            // @todo: use _getWordPos and remove redundant code
-            var text = editor.document.getLine(cursorPos.line),
-                column = cursorPos.ch,
-                remLength = text.length - column,
-                remText = text.substring(column, column + remLength), //Remaining text after cursor position
-                endIndex = remText.search(/\W\w/) + 1;                //Index of next word
-            selectedText = remText.substring(0, endIndex);
-            //Range to replace
-            textRange.start.line = cursorPos.line;
-            textRange.start.ch = column;
-            textRange.end.line = cursorPos.line;
-            textRange.end.ch = column + endIndex;
-        }
-        switch (type) {
-        case UPPER:
-            selectedText = selectedText.toUpperCase();
-            break;
-        case LOWER:
-            selectedText = selectedText.toLowerCase();
-            break;
-        }
-        doc.replaceRange(selectedText, textRange.start, textRange.end);
-    }
 
 //    function iSearchBackward() {
 //        // @todo: stub
@@ -142,7 +111,36 @@ define(function (require, exports, module) {
         
         return {line: line, ch: column};
     }
-    
+
+    function toggleCase(type) {
+        var editor       = EditorManager.getActiveEditor(),
+            doc          = editor.document,
+            cursorPos    = editor.getCursorPos();
+        var selectedText = editor.getSelectedText();
+        var textRange    = editor.getSelection();
+
+        // If nothing is selected, toggleCase for the next word
+        if (!selectedText) {
+            var nextPos = _getWordPos(1);
+            selectedText = doc.getRange(cursorPos, nextPos);
+            //Range to replace
+            textRange.start.line = cursorPos.line;
+            textRange.start.ch = cursorPos.ch;
+            textRange.end.line = nextPos.line;
+            textRange.end.ch = nextPos.ch;
+        }
+        
+        switch (type) {
+        case UPPER:
+            selectedText = selectedText.toUpperCase();
+            break;
+        case LOWER:
+            selectedText = selectedText.toLowerCase();
+            break;
+        }
+        doc.replaceRange(selectedText, textRange.start, textRange.end);
+    }
+
     /**
      * Function to move the cursor
      *
@@ -171,7 +169,7 @@ define(function (require, exports, module) {
         }
         editor.setCursorPos(line, column);
     }
-    
+
     AppInit.appReady(function () {
 
         var menus = Menus.getMenu(Menus.AppMenuBar.VIEW_MENU),
