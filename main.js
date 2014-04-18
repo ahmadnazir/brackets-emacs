@@ -105,7 +105,6 @@ define(function (require, exports, module) {
             break;
         }
         doc.replaceRange(selectedText, textRange.start, textRange.end);
-        editor.setCursorPos(cursorPos);                                //Reset to original cursor position
     }
 
 //    function iSearchBackward() {
