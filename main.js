@@ -192,6 +192,7 @@ define(function (require, exports, module) {
             UNDO                    = "emacs.undo",
             REDO                    = "emacs.redo",
             ISEARCH_FORWARD         = "emacs.isearch-forward",
+            ISEARCH_FORWARD_AGAIN   = "emacs.isearch-forward (again)",
             FIND_FILE               = "emacs.find-file",
             SAVE_BUFFER             = "emacs.save-buffer",
             COMMENT_DWIM            = "emacs.comment-dwim",
@@ -364,9 +365,14 @@ define(function (require, exports, module) {
                     name:       "ISearch Forward",
                     key:        "Ctrl-S",
                     overrideId:   Commands.EDIT_FIND,
-                    repeatCommand: {
-                        overrideId: Commands.EDIT_FIND_NEXT
-                    }
+                    commands: [
+                        {
+                            id:         ISEARCH_FORWARD_AGAIN,
+                            key:        "Ctrl-S",
+                            overrideId: Commands.EDIT_FIND_NEXT,
+                            repeatable: true
+                        }
+                    ]
                 }
 //              {
 //                  id:         SET_MARK_COMMAND,
@@ -394,6 +400,12 @@ define(function (require, exports, module) {
         
         EventHandler.prototype.availableCommands = undefined; // set on instantiation
         
+        /**
+         * @param {Boolean} inContext
+         * True if the available commands are restricted based on the previous key used
+         */
+        EventHandler.prototype.inContext = false;
+        
         EventHandler.prototype.getCommand = function (key) {
             var command = this.availableCommands.filter(function find(command) {
                 return (command.key === key) ? command : false;
@@ -411,6 +423,7 @@ define(function (require, exports, module) {
          */
         EventHandler.prototype.resetContext = function (commands) {
             this.availableCommands = commands || this.commands;
+            this.inContext = commands ? true : false;
         };
 
         EventHandler.prototype.handle = function (id, key) {
@@ -421,9 +434,15 @@ define(function (require, exports, module) {
             
             // Get the command to execute based on the stack
             var command = this.getCommand(key);
-            
+
+            // If command is not found, reset the context and invoke the handler again 
             if (!command) {
-                this.resetContext();
+                if (this.inContext) {
+                    this.resetContext();
+                    // @todo: at this point there should be some way to inform the user that the prefixer
+                    // command has been ignored
+                    this.handle(id, key);
+                }
                 return;
             }
             
@@ -431,24 +450,24 @@ define(function (require, exports, module) {
                 command = command.repeatCommand;
             }
             
-            if (!command.commands) {
-                if (command.overrideId) {
-                    CommandManager.execute(command.overrideId);
-                    
-                    // @todo: The following code can be used to execute multiple commands
-                    //        and the same can be used for callbacks
+            if (command.overrideId) {
+                CommandManager.execute(command.overrideId);
+
+                // @todo: The following code can be used to execute multiple commands
+                //        and the same can be used for callbacks
 //                    var ids = command.overrideId.forEach ? command.overrideId : [command.overrideId];
 //                    ids.forEach(function (id) {
 //                        CommandManager.execute(id);
 //                    });
-                    
-                } else {
-                    command.callback();
-                }
+
+            } else if (command.callback) {
+                command.callback();
             }
-            
-            // Update the context
-            this.resetContext(command.commands || undefined);
+
+            if (!command.repeatable) {
+                // Update the context
+                this.resetContext(command.commands || undefined);
+            }
         };
         
         var handler = new EventHandler(commands);
