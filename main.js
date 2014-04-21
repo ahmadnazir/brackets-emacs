@@ -193,6 +193,7 @@ define(function (require, exports, module) {
             REDO                    = "emacs.redo",
             ISEARCH_FORWARD         = "emacs.isearch-forward",
             ISEARCH_FORWARD_AGAIN   = "emacs.isearch-forward (again)",
+            ISEARCH_BACKWARD        = "emacs.isearch-backward",
             FIND_FILE               = "emacs.find-file",
             SAVE_BUFFER             = "emacs.save-buffer",
             COMMENT_DWIM            = "emacs.comment-dwim",
@@ -201,7 +202,6 @@ define(function (require, exports, module) {
             SAVE_AS                 = "emacs.write-file",
             // .. not implemented ..
             SET_MARK_COMMAND        = "emacs.set-mark-command",
-            ISEARCH_BACKWARD        = "emacs.isearch-backward",
 
             /*
              * Emacs commands
@@ -245,13 +245,6 @@ define(function (require, exports, module) {
                     key:        "Ctrl-K",
                     callback:   killRegion.bind(null, true)
                 },
-
-//                {
-//                    id:         ISEARCH_BACKWARD,
-//                    name:       "Incremental Search Backward",
-//                    key:        "Ctrl-R",
-//                    callback:   iSearchBackward
-//                },
                 {
                     id:         FORWARD_CHAR,
                     name:       "Forward Character",
@@ -371,15 +364,36 @@ define(function (require, exports, module) {
                             key:        "Ctrl-S",
                             overrideId: Commands.EDIT_FIND_NEXT,
                             repeatable: true
+                        },
+                        {
+                            id:         ISEARCH_BACKWARD,
+                            key:        "Ctrl-R",
+                            overrideId: Commands.EDIT_FIND_PREVIOUS,
+                            repeatable: true
                         }
                     ]
-                }
+                },
+
 //              {
 //                  id:         SET_MARK_COMMAND,
 //                  name:       "Set Mark Command",
 //                  key:        "Ctrl-Space",
 //                  callback:   setMarkCommand
 //              }
+                
+                /*
+                 * Dummy commands so that they are added to the keybindings
+                 * This is a hack so that the following commands that are context sensitive are registered
+                 *
+                 * @see #keybindings-context-sensitive
+                 */
+                
+                {
+                    id:         ISEARCH_BACKWARD,
+                    name:       "Incremental Search Backward",
+                    key:        "Ctrl-R"
+                }
+
             ];
 
 
@@ -480,6 +494,10 @@ define(function (require, exports, module) {
         }
 
         function addBinding(command) {
+
+            // @todo: #keybindings-context-sensitive
+            // We need to add bindings for the context sensitive commands.. but that might throw an error
+
             KeyBindingManager.addBinding(command.id, command.key);
         }
 
