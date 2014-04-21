@@ -150,6 +150,7 @@ define(function (require, exports, module) {
      *                                  position
      */
     function moveCursor(unit, type, absolute) {
+        EditorManager.focusEditor();
         var editor      = EditorManager.getFocusedEditor(),
             cursorPos   = editor.getCursorPos(),
             line        = cursorPos.line,
