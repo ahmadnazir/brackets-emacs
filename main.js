@@ -363,7 +363,10 @@ define(function (require, exports, module) {
                     id:         ISEARCH_FORWARD,
                     name:       "ISearch Forward",
                     key:        "Ctrl-S",
-                    overrideId:   Commands.EDIT_FIND
+                    overrideId:   Commands.EDIT_FIND,
+                    repeatCommand: {
+                        overrideId: Commands.EDIT_FIND_NEXT
+                    }
                 }
 //              {
 //                  id:         SET_MARK_COMMAND,
@@ -384,7 +387,7 @@ define(function (require, exports, module) {
          * @todo: move the EventHandler to a separate module
          */
         function EventHandler(allCommands) {
-            this.availableCommands = allCommands; // @todo: no need to copy array, right?
+            this.availableCommands = allCommands;
         }
 
         EventHandler.prototype.commands = commands;
@@ -410,7 +413,12 @@ define(function (require, exports, module) {
             this.availableCommands = commands || this.commands;
         };
 
-        EventHandler.prototype.handle = function (key) {
+        EventHandler.prototype.handle = function (id, key) {
+            
+            // Find if the command is being repeated
+            var repeat = this.lastCommand === id;
+            this.lastCommand = id;
+            
             // Get the command to execute based on the stack
             var command = this.getCommand(key);
             
@@ -419,9 +427,21 @@ define(function (require, exports, module) {
                 return;
             }
             
+            if (repeat && command.repeatCommand) {
+                command = command.repeatCommand;
+            }
+            
             if (!command.commands) {
                 if (command.overrideId) {
                     CommandManager.execute(command.overrideId);
+                    
+                    // @todo: The following code can be used to execute multiple commands
+                    //        and the same can be used for callbacks
+//                    var ids = command.overrideId.forEach ? command.overrideId : [command.overrideId];
+//                    ids.forEach(function (id) {
+//                        CommandManager.execute(id);
+//                    });
+                    
                 } else {
                     command.callback();
                 }
@@ -447,7 +467,7 @@ define(function (require, exports, module) {
         function register(command) {
             CommandManager.register(command.name,
                                     command.id,
-                                    handler.handle.bind(handler, command.key));
+                                    handler.handle.bind(handler, command.id, command.key));
             menus.addMenuItem(command.id);
         }
 
