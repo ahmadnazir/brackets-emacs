@@ -10,6 +10,36 @@ define(function (require, exports, module) {
         KeyBindingManager   = brackets.getModule("command/KeyBindingManager"),
         AppInit             = brackets.getModule("utils/AppInit"),
         
+        // Command Ids
+        MOVE_BEGINNING_OF_LINE  = "emacs.move-beginning-of-line",
+        MOVE_END_OF_LINE        = "emacs.move-end-of-line",
+        YANK                    = "emacs.yank",
+        YANK_POP                = "emacs.yank-pop",
+        KILL_REGION             = "emacs.kill-region",
+        KILL_RING_SAVE          = "emacs.kill-ring-save",
+        KILL_LINE               = "emacs.kill-line",
+        FORWARD_CHAR            = "emacs.forward-char",
+        BACKWARD_CHAR           = "emacs.backward-char",
+        FORWARD_WORD            = "emacs.forward-word",
+        BACKWARD_WORD           = "emacs.backward-word",
+        PREVIOUS_LINE           = "emacs.previous-line",
+        NEXT_LINE               = "emacs.next-line",
+        PREFIX_COMMAND          = "emacs.prefix-command",
+        KEYBOARD_QUIT           = "emacs.keyboard-quit",
+        UNDO                    = "emacs.undo",
+        REDO                    = "emacs.redo",
+        ISEARCH_FORWARD         = "emacs.isearch-forward",
+        ISEARCH_FORWARD_AGAIN   = "emacs.isearch-forward (again)",
+        ISEARCH_BACKWARD        = "emacs.isearch-backward",
+        FIND_FILE               = "emacs.find-file",
+        SAVE_BUFFER             = "emacs.save-buffer",
+        COMMENT_DWIM            = "emacs.comment-dwim",
+        UPCASE_REGION           = "emacs.upcase-region",
+        DOWNCASE_REGION         = "emacs.downcase-region",
+        SAVE_AS                 = "emacs.write-file",
+        // .. not implemented ..
+        SET_MARK_COMMAND        = "emacs.set-mark-command",
+
         // Constants
         CHAR        = "character",
         WORD        = "word",
@@ -23,7 +53,8 @@ define(function (require, exports, module) {
 
         // Text Selection Ring
         ring        = [],
-        ringIndex   = 0,
+        ringWriteIndex   = 0,
+        ringReadIndex   = 0,
         ringSize    = 15;
         
 //    function setMarkCommand() {
@@ -36,8 +67,9 @@ define(function (require, exports, module) {
         if (!selectedText) {
             return;
         }
-        ring[ringIndex % ringSize] = selectedText;
-        ringIndex++;
+        ring[ringWriteIndex % ringSize] = selectedText;
+        ringReadIndex = ringWriteIndex;
+        ringWriteIndex++;
     }
 
     function killRingSave() {
@@ -67,14 +99,24 @@ define(function (require, exports, module) {
         doc.replaceRange("", selection.start, selection.end);
     }
 
-    function yank() {
+    function yank(repeat) {
         if (ring.length === 0) {
             return;
         }
         var editor      = EditorManager.getFocusedEditor(),
             doc         = editor.document,
-            cursorPos   = editor.getCursorPos();
-        doc.replaceRange(ring[(ringIndex - 1) % ringSize], cursorPos);
+            start       = editor.getCursorPos(),
+            end;
+        if (repeat) {
+            start = yank.range.start;
+            end = yank.range.end;
+            ringReadIndex++;
+        }
+        doc.replaceRange(ring[ringReadIndex % ring.length], start, end);
+        yank.range = {
+            start: start,
+            end: editor.getCursorPos()
+        };
     }
 
 //    function iSearchBackward() {
@@ -175,35 +217,6 @@ define(function (require, exports, module) {
 
         var menus = Menus.getMenu(Menus.AppMenuBar.VIEW_MENU),
             
-            // Command Ids
-            MOVE_BEGINNING_OF_LINE  = "emacs.move-beginning-of-line",
-            MOVE_END_OF_LINE        = "emacs.move-end-of-line",
-            YANK                    = "emacs.yank",
-            KILL_REGION             = "emacs.kill-region",
-            KILL_RING_SAVE          = "emacs.kill-ring-save",
-            KILL_LINE               = "emacs.kill-line",
-            FORWARD_CHAR            = "emacs.forward-char",
-            BACKWARD_CHAR           = "emacs.backward-char",
-            FORWARD_WORD            = "emacs.forward-word",
-            BACKWARD_WORD           = "emacs.backward-word",
-            PREVIOUS_LINE           = "emacs.previous-line",
-            NEXT_LINE               = "emacs.next-line",
-            PREFIX_COMMAND          = "emacs.prefix-command",
-            KEYBOARD_QUIT           = "emacs.keyboard-quit",
-            UNDO                    = "emacs.undo",
-            REDO                    = "emacs.redo",
-            ISEARCH_FORWARD         = "emacs.isearch-forward",
-            ISEARCH_FORWARD_AGAIN   = "emacs.isearch-forward (again)",
-            ISEARCH_BACKWARD        = "emacs.isearch-backward",
-            FIND_FILE               = "emacs.find-file",
-            SAVE_BUFFER             = "emacs.save-buffer",
-            COMMENT_DWIM            = "emacs.comment-dwim",
-            UPCASE_REGION           = "emacs.upcase-region",
-            DOWNCASE_REGION         = "emacs.downcase-region",
-            SAVE_AS                 = "emacs.write-file",
-            // .. not implemented ..
-            SET_MARK_COMMAND        = "emacs.set-mark-command",
-
             /*
              * Emacs commands
              *
@@ -226,7 +239,15 @@ define(function (require, exports, module) {
                     id:         YANK,
                     name:       "Yank",
                     key:        "Ctrl-Y",
-                    callback:   yank
+                    callback:   yank,
+                    commands: [
+                        {
+                            id:         YANK_POP,
+                            key:        "Alt-Y",
+                            callback:   yank.bind(null, true),
+                            repeatable: true
+                        }
+                    ]
                 },
                 {
                     id:         KILL_REGION,
@@ -393,6 +414,11 @@ define(function (require, exports, module) {
                     id:         ISEARCH_BACKWARD,
                     name:       "Incremental Search Backward",
                     key:        "Ctrl-R"
+                },
+                {
+                    id:         YANK_POP,
+                    name:       "Yank Pop",
+                    key:        "Alt-Y"
                 }
 
             ];
