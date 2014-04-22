@@ -532,7 +532,7 @@ define(function (require, exports, module) {
             CommandManager.register(command.name,
                                     command.id,
                                     handler.handle.bind(handler, command.id, command.key));
-            menus.addMenuItem(command.id);
+            // menus.addMenuItem(command.id);
         }
 
         // @todo: using setTimeout since key module takes some time to load        
