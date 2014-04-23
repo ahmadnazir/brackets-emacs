@@ -123,10 +123,6 @@ define(function (require, exports, module) {
         };
     }
 
-//    function iSearchBackward() {
-//        // @todo: stub
-//    }
-
     function _getWordPos(num, absolute) {
         var editor      = EditorManager.getFocusedEditor(),
             cursorPos   = editor.getCursorPos(),
