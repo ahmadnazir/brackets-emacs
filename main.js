@@ -13,6 +13,7 @@ define(function (require, exports, module) {
         // Command Ids
 
         BEGINNING_OF_BUFFER     = "emacs.beginning-of-buffer",
+        END_OF_BUFFER           = "emacs.end-of-buffer",
         MOVE_BEGINNING_OF_LINE  = "emacs.move-beginning-of-line",
         MOVE_END_OF_LINE        = "emacs.move-end-of-line",
         YANK                    = "emacs.yank",
@@ -47,6 +48,7 @@ define(function (require, exports, module) {
         WORD        = "word",
         LINE        = "line",
         MAX_LINE_LENGTH = 1000,
+        MAX_FILE_LENGTH = 1000000,
         UPPER       = "UpperCase",
         LOWER       = "LowerCase",
         
@@ -234,8 +236,14 @@ define(function (require, exports, module) {
                 {
                     id:         BEGINNING_OF_BUFFER,
                     name:       "Move to Beginning of File",
-                    key:        "Alt-Shift-,", // M-x
+                    key:        "Alt-Shift-,", // M-<
                     callback:   setCursorPos.bind(null, {line: 0, ch: 0})
+                },
+                {
+                    id:         END_OF_BUFFER,
+                    name:       "Move to End of File",
+                    key:        "Alt-Shift-.", // M->
+                    callback:   setCursorPos.bind(null, {line: MAX_FILE_LENGTH, ch: MAX_LINE_LENGTH})
                 },
                 {
                     id:         MOVE_BEGINNING_OF_LINE,
