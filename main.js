@@ -11,6 +11,8 @@ define(function (require, exports, module) {
         AppInit             = brackets.getModule("utils/AppInit"),
         
         // Command Ids
+
+        BEGINNING_OF_BUFFER     = "emacs.beginning-of-buffer",
         MOVE_BEGINNING_OF_LINE  = "emacs.move-beginning-of-line",
         MOVE_END_OF_LINE        = "emacs.move-end-of-line",
         YANK                    = "emacs.yank",
@@ -213,6 +215,12 @@ define(function (require, exports, module) {
         editor.setCursorPos(line, column);
     }
 
+    function setCursorPos(pos) {
+        var editor      = EditorManager.getFocusedEditor();
+        editor.setCursorPos(pos.line, pos.ch);
+        console.log(123);
+    }
+
     AppInit.appReady(function () {
 
         var menus = Menus.getMenu(Menus.AppMenuBar.VIEW_MENU),
@@ -224,8 +232,14 @@ define(function (require, exports, module) {
              */
             commands = [
                 {
+                    id:         BEGINNING_OF_BUFFER,
+                    name:       "Move to Beginning of File",
+                    key:        "Alt-Shift-,", // M-x
+                    callback:   setCursorPos.bind(null, {line: 0, ch: 0})
+                },
+                {
                     id:         MOVE_BEGINNING_OF_LINE,
-                    name:       "Move Beginning of Line",
+                    name:       "Move to Beginning of Line",
                     key:        "Ctrl-A",
                     callback:   moveCursor.bind(this, 0, CHAR, true)
                 },
