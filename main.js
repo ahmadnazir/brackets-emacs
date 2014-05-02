@@ -101,6 +101,7 @@ define(function (require, exports, module) {
     function killRingSave() {
         var editor  = EditorManager.getFocusedEditor();
         _killRingSave(editor.getSelectedText());
+        clearMark();
     }
 
     function killRegion(killLine) {
@@ -144,6 +145,7 @@ define(function (require, exports, module) {
             start: start,
             end: editor.getCursorPos()
         };
+        clearMark();
     }
 
     function _getWordPos(num, absolute) {
