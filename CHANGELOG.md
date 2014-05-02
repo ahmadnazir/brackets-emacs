@@ -25,6 +25,11 @@ Thanks to Udit Mukherjee (uditmukherjee457) for the contributions.
 
 *   (Ctrl-Y) Alt-Y      :   "yank-pop"
 
-**1.0.6   (1st May 2014)**
+**1.0.6   (3rd May 2014)**
 
-*   Very basic mark-mode support.
+Very basic mark-mode support and additional cursor navigation functionality.
+
+*   C-SPC               :   "set-mark-command"
+*   C-g                 :   "keyboard-quit"
+*   M-<                 :   "beginning-of-buffer"
+*   M->                 :   "end-of-buffer"
