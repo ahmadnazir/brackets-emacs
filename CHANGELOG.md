@@ -24,3 +24,7 @@ Thanks to Udit Mukherjee (uditmukherjee457) for the contributions.
     e.g. Pressing Ctrl-S will launch search and pressing it again will go to the next item found
 
 *   (Ctrl-Y) Alt-Y      :   "yank-pop"
+
+**1.0.6   (1st May 2014)**
+
+*   Very basic mark-mode support.
