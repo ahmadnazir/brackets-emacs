@@ -40,7 +40,6 @@ define(function (require, exports, module) {
         UPCASE_REGION           = "emacs.upcase-region",
         DOWNCASE_REGION         = "emacs.downcase-region",
         SAVE_AS                 = "emacs.write-file",
-        // .. not implemented ..
         SET_MARK_COMMAND        = "emacs.set-mark-command",
 
         // Constants
@@ -52,21 +51,44 @@ define(function (require, exports, module) {
         UPPER       = "UpperCase",
         LOWER       = "LowerCase",
         
-//        // Mark
-//        isMarkSet   = false,
-
         // Text Selection Ring
         ring        = [],
         ringWriteIndex   = 0,
         ringReadIndex   = 0,
         ringSize    = 15;
+    
+    function equivPositions(a, b) {
+        return a === b ||
+               (a.line === b.line && a.ch === b.ch);
+    }
+    
+    function setMarkCommand() {
+        var editor      = EditorManager.getFocusedEditor();
+        var codemirror  = editor._codeMirror;
         
-//    function setMarkCommand() {
-//        isMarkSet = !isMarkSet;
-//        
-//        console.log("Mark " + (isMarkSet ? "un" : "") + "set");
-//    }
-
+        // The mark is the anchor-point of the current selection.
+        var mark       = codemirror.getCursor("anchor");
+        // The point is the current moving part of the selection.
+        var point      = codemirror.getCursor("head");
+        var markActive = codemirror.getExtending();
+        
+        // We want the mark to be active if either:
+        // - The point is in a different position than the previous mark
+        // - The mark was not active
+        codemirror.setExtending(!equivPositions(mark, point) || !markActive);
+        // We set the point after updating extending to cause codemirror to
+        // update its selection object so it actually updates as the point moves
+        // around.
+        codemirror.setCursor(point);
+    }
+    
+    function clearMark() {
+        var editor      = EditorManager.getFocusedEditor();
+        var codemirror  = editor._codeMirror;
+        codemirror.setExtending(false);
+        codemirror.setCursor(codemirror.getCursor("head"));
+    }
+    
     function _killRingSave(selectedText) {
         if (!selectedText) {
             return;
@@ -101,6 +123,7 @@ define(function (require, exports, module) {
             _killRingSave(editor.getSelectedText());
         }
         doc.replaceRange("", selection.start, selection.end);
+        clearMark();
     }
 
     function yank(repeat) {
@@ -194,6 +217,7 @@ define(function (require, exports, module) {
     function moveCursor(unit, type, absolute) {
         EditorManager.focusEditor();
         var editor      = EditorManager.getFocusedEditor(),
+            codemirror  = editor._codeMirror,
             cursorPos   = editor.getCursorPos(),
             line        = cursorPos.line,
             column        = cursorPos.ch;
@@ -210,7 +234,7 @@ define(function (require, exports, module) {
             column = pos.ch;
             break;
         }
-        editor.setCursorPos(line, column);
+        codemirror.extendSelection({ line: line, ch: column });
     }
 
     function setCursorPos(pos) {
@@ -369,6 +393,7 @@ define(function (require, exports, module) {
                     // bind this command to keyboard-quit handler
                     // it should act similar to the Esc key in most cases
                     // Will look into it later
+                    callback:   clearMark,
                     commands:   [
                         {
                             id:         REDO,
@@ -413,13 +438,12 @@ define(function (require, exports, module) {
                         }
                     ]
                 },
-
-//              {
-//                  id:         SET_MARK_COMMAND,
-//                  name:       "Set Mark Command",
-//                  key:        "Ctrl-Space",
-//                  callback:   setMarkCommand
-//              }
+                {
+                    id:         SET_MARK_COMMAND,
+                    name:       "Set Mark Command",
+                    key:        "Ctrl-Space",
+                    callback:   setMarkCommand
+                },
                 
                 /*
                  * Dummy commands so that they are added to the keybindings
