@@ -138,7 +138,7 @@ define(function (require, exports, module) {
         if (repeat) {
             start = yank.range.start;
             end = yank.range.end;
-            ringReadIndex++;
+            ringReadIndex = --ringReadIndex < 0 ? (ring.length + ringReadIndex) : ringReadIndex;
         }
         doc.replaceRange(ring[ringReadIndex % ring.length], start, end);
         yank.range = {
