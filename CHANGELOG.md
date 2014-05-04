@@ -38,6 +38,6 @@ Basic mark-mode support and additional cursor navigation functionality.
 Thanks to [Andrew Sutherland](https://github.com/asutherland) for implementing the mark-mode functionality.
 
 
-**1.0.6   (4th May 2014)**
+**1.0.7   (4th May 2014)**
 
-Fixes issue [#7](https://github.com/ahmadnazir/brackets-emacs/issues/7)
+Fix for [#7](https://github.com/ahmadnazir/brackets-emacs/issues/7)
