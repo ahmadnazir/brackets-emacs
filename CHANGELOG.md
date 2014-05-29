@@ -41,3 +41,7 @@ Thanks to [Andrew Sutherland](https://github.com/asutherland) for implementing t
 **1.0.7   (4th May 2014)**
 
 Fix for [#7](https://github.com/ahmadnazir/brackets-emacs/issues/7)
+
+**1.0.8   (29th May 2014)**
+
+Fix for [#8](https://github.com/ahmadnazir/brackets-emacs/issues/8)
