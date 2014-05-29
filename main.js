@@ -148,34 +148,64 @@ define(function (require, exports, module) {
         clearMark();
     }
 
-    function _getWordPos(num, absolute) {
+    function _getWordPos(num, relativeToPos) {
         var editor      = EditorManager.getFocusedEditor(),
             cursorPos   = editor.getCursorPos(),
-            line        = cursorPos.line,
-            column        = cursorPos.ch;
+            line,
+            column;
+
+        if (relativeToPos) {
+            line = relativeToPos.line;
+            column = relativeToPos.ch;
+
+            // Sanity Checks
+            // @todo: this section can be moved below to improve readability of the code
+            if (line < 0  || column < 0) {
+                return {line: cursorPos.line, ch: cursorPos.ch};
+            }
+
+        } else {
+            line = cursorPos.line;
+            column = cursorPos.ch;
+        }
+
 
         if (Math.abs(num) !== 1) {
             throw new Error("Cursor positioning for multiple words is not supported");
         }
         
         var text = editor.document.getLine(line),
-            lineLength = text.length;
-        if (num === 1) {
+            lineLength = text.length,
+            indexOfNextWord;
+
+        // Base condition for recursion
+        if (typeof text === 'undefined') {
+            return {line: line, ch: column};
+        }
+
+        if (num > 0) {
             text = text.substring(column);
+            indexOfNextWord = text.search(/\W\w/) + 1;
         } else {
             // @todo: use a better implementation for reversing a string
             // http://eddmann.com/posts/ten-ways-to-reverse-a-string-in-javascript/
             text = text.split("").reverse().join("").substring(lineLength - column);
+            indexOfNextWord = text.search(/\w\W/) + 1;
         }
 
-        var indexOfNextWord = text.search(/\W\w/) + 1;
         if (indexOfNextWord > 0) {
-            column += (num * indexOfNextWord) - (absolute ? column : 0);
+            column += (num * indexOfNextWord);
         } else {
-            line += num > 0 ? 1 : -1;
-            column = num > 0 ? 0 : MAX_LINE_LENGTH;
+            var _line = line + (num > 0 ? 1 : -1);
+            var pos = _getWordPos(num,
+                    {
+                        line: _line,
+                        ch: num > 0 ? 0 : editor.document.getLine(_line).length
+                    });
+            line = pos.line;
+            column = pos.ch;
         }
-        
+
         return {line: line, ch: column};
     }
 
@@ -231,7 +261,10 @@ define(function (require, exports, module) {
             line += unit - (absolute ? line : 0);
             break;
         case WORD:
-            var pos = _getWordPos(unit, absolute);
+            if (absolute) {
+                throw new Error('The option absolute is not supported for type WORD');
+            }
+            var pos = _getWordPos(unit);
             line = pos.line;
             column = pos.ch;
             break;
