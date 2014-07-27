@@ -457,18 +457,18 @@ define(function (require, exports, module) {
                     id:         ISEARCH_FORWARD,
                     name:       "ISearch Forward",
                     key:        "Ctrl-S",
-                    overrideId:   Commands.EDIT_FIND,
+                    overrideId:   Commands.CMD_FIND,
                     commands: [
                         {
                             id:         ISEARCH_FORWARD_AGAIN,
                             key:        "Ctrl-S",
-                            overrideId: Commands.EDIT_FIND_NEXT,
+                            overrideId: Commands.CMD_FIND_NEXT,
                             repeatable: true
                         },
                         {
                             id:         ISEARCH_BACKWARD,
                             key:        "Ctrl-R",
-                            overrideId: Commands.EDIT_FIND_PREVIOUS,
+                            overrideId: Commands.CMD_FIND_PREVIOUS,
                             repeatable: true
                         }
                     ]

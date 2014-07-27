@@ -45,3 +45,7 @@ Fix for [#7](https://github.com/ahmadnazir/brackets-emacs/issues/7)
 **1.0.8   (29th May 2014)**
 
 Fix for [#8](https://github.com/ahmadnazir/brackets-emacs/issues/8)
+
+**1.0.9   (27th July 2014)**
+
+Fix for [#2](https://github.com/ahmadnazir/brackets-emacs/issues/2)
