@@ -277,18 +277,7 @@ define(function (require, exports, module) {
         var editor = EditorManager.getFocusedEditor(),
             doc = editor.document;
         var start = editor.getCursorPos();
-        var end;
-        if (dir === true) {
-            end = {
-                line: start.line,
-                ch: _getWordPos(1).ch
-            };
-        } else {
-            end = {
-                line: start.line,
-                ch: _getWordPos(-1).ch
-            };
-        }
+        var end= _getWordPos(dir===true?1:-1);        
         var text = doc.getRange(start, end);
         var selection = {
             start: start,
