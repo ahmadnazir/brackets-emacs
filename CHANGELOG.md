@@ -1,6 +1,20 @@
+**1.1.0     (21st October 2015)**
+
+Added:
+
+*  Alt-D                :   "kill-line"
+*  Alt-backspace        :   "backward-kill-word"
+
+Fixed:
+
+- #8 "forward-word" takes the cursor to the start of the next word
+
+Contributions:
+- [blackmiaool](https://github.com/blackmiaool)
+
 **1.0.2     (7th April 2014)**
 
-*  Ctrl-K              :   "kill-line"
+*  Ctrl-K               :   "kill-line"
 
 
 **1.0.3   (17th April 2014)**
