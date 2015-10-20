@@ -21,6 +21,8 @@ define(function (require, exports, module) {
         KILL_REGION             = "emacs.kill-region",
         KILL_RING_SAVE          = "emacs.kill-ring-save",
         KILL_LINE               = "emacs.kill-line",
+        KILL_FORWARD_WORD = "emacs.kill-forward-word",
+        KILL_BACKWARD_WORD = "emacs.kill-backward-word",
         FORWARD_CHAR            = "emacs.forward-char",
         BACKWARD_CHAR           = "emacs.backward-char",
         FORWARD_WORD            = "emacs.forward-word",
@@ -185,7 +187,7 @@ define(function (require, exports, module) {
 
         if (num > 0) {
             text = text.substring(column);
-            indexOfNextWord = text.search(/\W\w/) + 1;
+            indexOfNextWord = text.search(/\w\W/) + 1;
         } else {
             // @todo: use a better implementation for reversing a string
             // http://eddmann.com/posts/ten-ways-to-reverse-a-string-in-javascript/
@@ -271,7 +273,19 @@ define(function (require, exports, module) {
         }
         codemirror.extendSelection({ line: line, ch: column });
     }
-
+    function killWord(dir) {
+        var editor = EditorManager.getFocusedEditor(),
+            doc = editor.document;
+        var start = editor.getCursorPos();
+        var end= _getWordPos(dir===true?1:-1);        
+        var text = doc.getRange(start, end);
+        var selection = {
+            start: start,
+            end: end
+        };
+        _killRingSave(text);
+        doc.replaceRange("", selection.start, selection.end);
+    }
     function setCursorPos(pos) {
         var editor      = EditorManager.getFocusedEditor();
         editor.setCursorPos(pos.line, pos.ch);
@@ -496,7 +510,19 @@ define(function (require, exports, module) {
                     id:         YANK_POP,
                     name:       "Yank Pop",
                     key:        "Alt-Y"
-                }
+                },          
+                {
+                    id: KILL_FORWARD_WORD,
+                    name: "Set Mark Command",
+                    key: "Alt-D",
+                    callback: killWord.bind(this, true)
+                },
+                {
+                    id: KILL_BACKWARD_WORD,
+                    name: "Set Mark Command",
+                    key: "Alt-Backspace",
+                    callback: killWord.bind(this, false)
+                },
 
             ];
 
