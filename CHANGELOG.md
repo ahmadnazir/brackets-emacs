@@ -1,3 +1,11 @@
+**1.1.1     (8th August 2016)**
+
+Fixed:
+
+Cursor positioning when using the commands Alt-B "kill-line" and Alt-F "backward-kill-word".
+
+Thanks to [blackmiaool](https://github.com/blackmiaool) for the fix.
+
 **1.1.0     (21st October 2015)**
 
 Added:
