@@ -184,15 +184,15 @@ define(function (require, exports, module) {
         if (typeof text === 'undefined') {
             return {line: line, ch: column};
         }
-
+        var wordBoundary=/(?:[\w\u0080-\uFFFF])[^\w\u0800-\uFFFF]|(?:[\w\u0080-\uFFFF])$/;
         if (num > 0) {
             text = text.substring(column);
-            indexOfNextWord = text.search(/\w\W|\w$/) + 1;
+            indexOfNextWord = text.search(wordBoundary) + 1;
         } else {
             // @todo: use a better implementation for reversing a string
             // http://eddmann.com/posts/ten-ways-to-reverse-a-string-in-javascript/
             text = text.split("").reverse().join("").substring(lineLength - column);
-            indexOfNextWord = text.search(/\w\W|\w$/) + 1;
+            indexOfNextWord = text.search(wordBoundary) + 1;
         }
 
         if (indexOfNextWord > 0) {
