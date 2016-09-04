@@ -1,3 +1,11 @@
+**1.1.2     (4th September 2016)**
+
+Fixed:
+
+Support for other languages for "forward-word" and "backward-word".
+
+Thanks to [blackmiaool](https://github.com/blackmiaool).
+
 **1.1.1     (8th August 2016)**
 
 Fixed:
