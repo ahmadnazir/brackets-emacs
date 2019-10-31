@@ -43,6 +43,7 @@ define(function (require, exports, module) {
         DOWNCASE_REGION         = "emacs.downcase-region",
         SAVE_AS                 = "emacs.write-file",
         SET_MARK_COMMAND        = "emacs.set-mark-command",
+        DELETE_CHAR_AFTER       = "emacs.delete-char-after",
 
         // Constants
         CHAR        = "character",
@@ -273,6 +274,7 @@ define(function (require, exports, module) {
         }
         codemirror.extendSelection({ line: line, ch: column });
     }
+    
     function killWord(dir) {
         var editor = EditorManager.getFocusedEditor(),
             doc = editor.document;
@@ -286,12 +288,24 @@ define(function (require, exports, module) {
         _killRingSave(text);
         doc.replaceRange("", selection.start, selection.end);
     }
+    
     function setCursorPos(pos) {
         var editor      = EditorManager.getFocusedEditor();
         editor.setCursorPos(pos.line, pos.ch);
         console.log(123);
     }
 
+    function deleteCharAfter() {
+        var editor = EditorManager.getFocusedEditor();
+        var doc = editor.document;
+        var start = editor.getCursorPos(),
+            end = editor.getCursorPos();
+        
+        end.ch++;
+        
+        doc.replaceRange("", start, end);
+    }
+    
     AppInit.appReady(function () {
 
         var menus = Menus.getMenu(Menus.AppMenuBar.VIEW_MENU),
@@ -523,7 +537,13 @@ define(function (require, exports, module) {
                     key: "Alt-Backspace",
                     callback: killWord.bind(this, false)
                 },
-
+                {
+                    id: DELETE_CHAR_AFTER,
+                    name: "Delete Character After",
+                    key: "Ctrl-D",
+                    callback: deleteCharAfter.bind(this)
+                },
+            
             ];
 
 
